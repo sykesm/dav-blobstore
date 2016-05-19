@@ -1,9 +1,9 @@
-## Simple Bosh dav Blob Store
+## Simple dav blob store for bosh
 
 There are times when you want to share a bosh release but you really don't
-want to deal with the expense of getting an s3 or swift blob store up on the
-internet. All you really want is a very simple blob store that provides good
-read access to the public and authenticated write access for yourself.
+want to deal with the expense of setting up an s3 or swift blob store up on
+the internet. All you really want is a very simple blob store that provides
+basic read access to the public and authenticated write access for yourself.
 
 Okay - even if you don't have that problem, I did. And when I did have that
 problem, I didn't want to deal with standing up the ruby "simple" blob store

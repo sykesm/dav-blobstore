@@ -20,7 +20,7 @@ type Config struct {
 
 var configFile = flag.String(
 	"configFile",
-	"",
+	"config.json",
 	"The path to the configuration file",
 )
 
