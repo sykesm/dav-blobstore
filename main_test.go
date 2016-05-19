@@ -17,6 +17,7 @@ import (
 	. "github.com/onsi/gomega"
 	"github.com/onsi/gomega/gbytes"
 	"github.com/onsi/gomega/gexec"
+
 	"github.com/sykesm/dav-blobstore"
 )
 
@@ -33,12 +34,11 @@ var _ = Describe("main", func() {
 
 	BeforeEach(func() {
 		var err error
+		tempDir, err = ioutil.TempDir("", "dav-blobstore")
+		Expect(err).NotTo(HaveOccurred())
 
 		listenAddress = fmt.Sprintf("127.0.0.1:%d", 14000+GinkgoParallelNode())
 		u, err = url.Parse(fmt.Sprintf("http://%s/config.json", listenAddress))
-		Expect(err).NotTo(HaveOccurred())
-
-		tempDir, err = ioutil.TempDir("", "dav-blobstore")
 		Expect(err).NotTo(HaveOccurred())
 
 		serverConfig = &main.Config{

@@ -2,13 +2,14 @@
 
 There are times when you want to share a bosh release but you really don't
 want to deal with the expense of setting up an s3 or swift blob store up on
-the internet. All you really want is a very simple blob store that provides
-basic read access to the public and authenticated write access for yourself.
+the internet. What you really want is a very simple blob store that provides
+basic read access to a small community of users and authenticated write access
+for yourself.
 
-Okay - even if you don't have that problem, I did. And when I did have that
-problem, I didn't want to deal with standing up the ruby "simple" blob store
-and I discovered that bosh doesn't actually work with compliant WebDAV servers
-so, here we are.
+Okay - even if you don't have that problem, I did. And when I did have the
+problem, I didn't want to deal with setting up the ruby "simple" blob store
+with SSL and I discovered that the bosh cli doesn't actually work with
+compliant WebDAV servers so, here we are.
 
 ### Building the server
 
@@ -18,9 +19,10 @@ Simply use `go get` to get the server and install it to `${GOPATH}/bin`:
 go get github.com/sykesm/dav-blobstore
 ```
 
-### Running the server
+### Configuring the server
 
-In order to run the server, you need to point to a JSON configuration file.
+In order to use the server, you need to create a JSON configuration file and
+point the server to it.
 
 ```json
 {
@@ -34,24 +36,25 @@ In order to run the server, you need to point to a JSON configuration file.
 }
 ```
 
-`blobs_path` is the only required field and it points to root directory of the
-blob store.
+`blobs_path` is the only required field and it points to the root directory of
+the blob store.
 
 `public_read` indicates whether or not `GET` and `HEAD` requests require
 authentication. If omitted or `false`, you will want to define authorized
 users in the `users` field.
 
-`cert_file` and `key_file` are used to enable TLS on the transport. When both
-of these fields are set, the server will only support https. Enabling TLS is
-recommended.
+`cert_file` and `key_file` are used to enable TLS. When both of these fields
+are set, the server will only support https. Enabling TLS is recommended.
 
-`users` is a map of key value pairs representing authorized users and they
-passwords. Basic authentication is required for operation other than `GET` or
-`HEAD` regardless of the value of `public_read`.
+`users` is a map of key value pairs representing authorized users and their
+passwords. Basic authentication is always used for operations other than `GET`
+and `HEAD` -- regardless of the value of `public_read`.
 
-Once the configuration file is ready, you can simply launch the server with
-the `-configFile` flag.  If you wish to control which address the server
-listens on, you can set `-listenAddress`.
+### Running the server
+
+Once the configuration file is ready, you simply launch the server with the
+`-configFile` flag.  If you wish to control which address the server listens
+on, you can set `-listenAddress`.
 
 ```
 ${GOPATH}/bin/dav-blobstore -listenAddress :14000 -configFile /user/local/etc/config.json
