@@ -11,6 +11,8 @@ problem, I didn't want to deal with setting up the ruby "simple" blob store
 with SSL and I discovered that the bosh cli doesn't actually work with
 compliant WebDAV servers so, here we are.
 
+[![Build Status](https://img.shields.io/travis/sykesm/dav-blobstore/master.svg?style=flat-square)](https://travis-ci.org/sykesm/dav-blobstore)
+
 ### Building the server
 
 Simply use `go get` to get the server and install it to `${GOPATH}/bin`:
