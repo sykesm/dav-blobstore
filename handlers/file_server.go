@@ -38,20 +38,20 @@ func (fs *FileServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	case http.MethodPut:
 		err := os.MkdirAll(filepath.Dir(location), 0755)
 		if err != nil {
-			sendErrorResponse(w, err)
+			sendErrorResponse(w, r, err)
 			return
 		}
 
 		output, err := os.OpenFile(location, os.O_WRONLY|os.O_CREATE|os.O_EXCL, 0666)
 		if err != nil {
-			sendErrorResponse(w, err)
+			sendErrorResponse(w, r, err)
 			return
 		}
 		defer output.Close()
 
 		_, err = io.Copy(output, r.Body)
 		if err != nil {
-			sendErrorResponse(w, err)
+			sendErrorResponse(w, r, err)
 			return
 		}
 
@@ -60,7 +60,7 @@ func (fs *FileServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	case http.MethodDelete:
 		err := os.Remove(location)
 		if err != nil {
-			sendErrorResponse(w, err)
+			sendErrorResponse(w, r, err)
 			return
 		}
 		w.WriteHeader(http.StatusNoContent)
@@ -70,10 +70,14 @@ func (fs *FileServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func sendErrorResponse(w http.ResponseWriter, err error) {
+func sendErrorResponse(w http.ResponseWriter, r *http.Request, err error) {
 	switch {
 	case os.IsExist(err):
-		w.WriteHeader(http.StatusConflict)
+		if r.Method == http.MethodDelete {
+			w.WriteHeader(http.StatusBadRequest)
+		} else {
+			w.WriteHeader(http.StatusConflict)
+		}
 	case os.IsNotExist(err):
 		w.WriteHeader(http.StatusNotFound)
 	case os.IsPermission(err):
