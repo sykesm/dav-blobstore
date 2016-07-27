@@ -58,6 +58,24 @@ var _ = Describe("FileServer", func() {
 			Expect(response.Code).To(Equal(http.StatusOK))
 			Expect(response.Body.Bytes()).To(BeEquivalentTo("blob-data"))
 		})
+
+		Context("when a .redirect exists", func() {
+			BeforeEach(func() {
+				redirect := filepath.Join(tempDir, "redirect.txt.redirect")
+				err := ioutil.WriteFile(redirect, []byte("http://example.com/redirected/resource.txt"), 0644)
+				Expect(err).NotTo(HaveOccurred())
+			})
+
+			It("redirects the client to the location in the redirect", func() {
+				req, err := http.NewRequest(http.MethodGet, "http://example.com/redirect.txt", nil)
+				Expect(err).NotTo(HaveOccurred())
+
+				handler.ServeHTTP(response, req)
+
+				Expect(response.Code).To(Equal(http.StatusTemporaryRedirect))
+				Expect(response.HeaderMap).To(HaveKeyWithValue("Location", []string{"http://example.com/redirected/resource.txt"}))
+			})
+		})
 	})
 
 	Describe("HEAD", func() {
@@ -78,6 +96,24 @@ var _ = Describe("FileServer", func() {
 			Expect(response.Code).To(Equal(http.StatusOK))
 			Expect(response.HeaderMap).To(HaveKey("Last-Modified"))
 			Expect(response.HeaderMap).To(HaveKeyWithValue("Content-Length", []string{"9"}))
+		})
+
+		Context("when a .redirect exists", func() {
+			BeforeEach(func() {
+				redirect := filepath.Join(tempDir, "redirect.txt.redirect")
+				err := ioutil.WriteFile(redirect, []byte("http://example.com/redirected/resource.txt"), 0644)
+				Expect(err).NotTo(HaveOccurred())
+			})
+
+			It("redirects the client to the location in the redirect", func() {
+				req, err := http.NewRequest(http.MethodHead, "http://example.com/redirect.txt", nil)
+				Expect(err).NotTo(HaveOccurred())
+
+				handler.ServeHTTP(response, req)
+
+				Expect(response.Code).To(Equal(http.StatusTemporaryRedirect))
+				Expect(response.HeaderMap).To(HaveKeyWithValue("Location", []string{"http://example.com/redirected/resource.txt"}))
+			})
 		})
 	})
 

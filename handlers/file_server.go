@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"io"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
@@ -9,6 +10,8 @@ import (
 	"path/filepath"
 	"strings"
 )
+
+const REDIRECT_SUFFIX = ".redirect"
 
 type FileServer struct {
 	Root string
@@ -32,6 +35,11 @@ func (fs *FileServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	switch r.Method {
 	case http.MethodGet, http.MethodHead:
+		redirect, err := ioutil.ReadFile(location + REDIRECT_SUFFIX)
+		if err == nil {
+			http.Redirect(w, r, string(redirect), http.StatusTemporaryRedirect)
+			return
+		}
 		httpFS := http.FileServer(http.Dir(fs.Root))
 		httpFS.ServeHTTP(w, r)
 

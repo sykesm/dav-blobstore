@@ -10,7 +10,7 @@ import (
 
 func TestDavBlobstore(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "dav blobstore Suite")
+	RunSpecs(t, "DAV Blob Store Suite")
 }
 
 var davServerPath string
